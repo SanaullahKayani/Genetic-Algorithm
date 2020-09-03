@@ -1,0 +1,118 @@
+import random
+import copy
+import numpy as np
+POPULATION_SIZE = 8
+GENERATIONS = 15
+TARGET_CHROMOSOME = [1,1,0,1,0,0,1,1,1,0,1,0,0,0,0,1]
+len(TARGET_CHROMOSOME)
+def create_population():
+    chromesome = []
+    i = 0
+    while i < POPULATION_SIZE:
+        chromesome.append(create_chromosome())
+        i+=1
+        
+    return chromesome
+
+def create_chromosome():
+    genes = []
+    i = 0
+    while i < len(TARGET_CHROMOSOME):
+        if random.random() >= 0.5:
+            genes.append(1)
+        else:
+            genes.append(0)
+        i+=1
+    return genes 
+    
+    
+def fitness1(gene):
+    
+    return sum(gene)
+    
+def pop_fitness(population):
+    pop_list = []
+    if np.shape(population)[1] is 2:
+        for i in population:
+            pop_list.append((i[0],fitness1(i[0])))
+
+    else:
+        
+        for i in population:
+            pop_list.append((i,fitness1(i)))
+        
+    return sorted(pop_list,key=lambda x :x[1],reverse=True)  
+
+
+
+def selection(pop_fit):
+    select = []
+    for i in range(0,POPULATION_SIZE//2):
+        select.append((pop_fit)[i])
+    return select
+    
+
+def cross_over(Select):
+    cros_list = []
+    split1 = 4
+    split2 = 6
+    for i in range(0,len(Select),2):
+        
+        p1 = Select[i]
+        p2 = Select[i+1]
+        c1 = p1[0][:split1] + p2[0][split1:]
+        c2 = p2[0][:split1] + p1[0][split1:]
+        cros_list.append(p1[0])
+        cros_list.append(p2[0])
+        cros_list.append(c1)
+        cros_list.append(c2)
+    
+    return cros_list
+
+
+
+def mutation(crsovr_pop):
+    muta_list = []
+    for no,i in enumerate(crsovr_pop):
+        j = copy.deepcopy(i)
+        index = random.randrange(0,len(j))
+        j[index] = 0 if j[index] == 1  else 1
+        muta_list.append(j)        
+    
+    return muta_list
+
+
+def show_pop(pop,gen_no):
+    
+    print('\n Generation no : [',gen_no,']' , 'Best Chromesome : ',pop[0][0], ' Fitness : ',pop[0][1] )
+    
+    print("---------------------------------------------")
+    for no,i in enumerate(pop):
+        print('chromosome #', no,' <<< ',i[0] ,' >>> ' ,'Fitness : ', i[1])
+        
+
+def GA():
+    POPU = None
+    for generation in range(GENERATIONS):
+        if POPU is None:
+            POPU = create_population()
+            POP = pop_fitness(POPU)
+        else:
+            
+            print('\n Generation no : [',generation,']')
+            show_pop(POP,generation)
+            POP = selection(POP)
+            POP = cross_over(POP)
+            print("dDCccccc",POP)
+            POP = mutation(POP)
+            print("aaaaaaaaaaaac",POP)
+            POP = pop_fitness(POP)
+ 
+            if any(sum(i[0])==len(TARGET_CHROMOSOME) for i in POP ):
+                print('\n===========+++++===========+++++==============\n ')
+                print('Threshold met!')
+                show_pop(POP,generation)
+                break
+    
+
+GA()
